@@ -45,3 +45,15 @@ class ProductKit
 jQuery ->
   $(document).ready ->
     new ProductKit()
+
+Spree.ready ($) ->
+  if ($ 'form#update-cart').is('*')
+    $('form#update-cart a.delete').off 'click' # turn off default handler
+    ($ 'form#update-cart a.delete').show().one 'click', ->
+      tr = ($ this).parents('.line-item').first()
+      tr.find('input.line_item_quantity').val 0
+      slave_rows = tr.nextUntil('tr.master-item', 'tr.slave-item').get()
+      $(slave_rows).each (i, row) ->
+        $(row).find('input.line_item_quantity').val 0
+      ($ this).parents('form').first().submit()
+      false

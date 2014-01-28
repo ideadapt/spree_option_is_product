@@ -80,6 +80,16 @@ table.stock-contents{
           font-size: 12px;
           text-align: center;
         }
+        td.cart-item-quantity {
+          input.line_item_quantity {
+            border: 0 none;
+            background: transparent;
+            &::-webkit-outer-spin-button, &::-webkit-inner-spin-button {
+              -webkit-appearance: none;
+              margin: 0;
+            }
+          }
+        }
       }
       &.alt.slave-item{
         td{
