@@ -47,13 +47,23 @@ jQuery ->
     new ProductKit()
 
 Spree.ready ($) ->
+  reset_children_quantity = ->
+    parent_rows = $('tbody#line_items tr.master-item')
+    parent_rows.each (i, parent_row) ->
+      parent_row = $(parent_row)
+      value = parent_row.find('input.line_item_quantity').val()
+      if value == '0'
+        slave_rows = parent_row.nextUntil('tr.master-item', 'tr.slave-item').get()
+        $(slave_rows).each (i, row) ->
+          $(row).find('input.line_item_quantity').val 0
+
   if ($ 'form#update-cart').is('*')
     $('form#update-cart a.delete').off 'click' # turn off default handler
     ($ 'form#update-cart a.delete').show().one 'click', ->
       tr = ($ this).parents('.line-item').first()
       tr.find('input.line_item_quantity').val 0
-      slave_rows = tr.nextUntil('tr.master-item', 'tr.slave-item').get()
-      $(slave_rows).each (i, row) ->
-        $(row).find('input.line_item_quantity').val 0
       ($ this).parents('form').first().submit()
       false
+
+    ($ 'form#update-cart').on 'submit', ->
+      reset_children_quantity()
