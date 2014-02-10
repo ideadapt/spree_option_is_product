@@ -1,4 +1,7 @@
 Spree::Product.class_eval do
+
+  scope :kits, -> { joins(:option_types).where(:spree_option_types => { :product_based => true }).uniq }
+
   def has_product_options?
     return false if option_types.blank?
     option_types.collect(&:product_based).include?(true)
