@@ -4,47 +4,47 @@
     <div class="product_options_group">
       <% @product.product_options.each do |o| %>
         <%
-          optional_value = o[:options].select{ |opt| opt[:default_option] == true }
-          optional_value_id = (!optional_value.empty?) ? optional_value.first : {}
+          optional_value = o.option_values.default
+          optional_value_id = optional_value.first || {}
         %>
         <div class="product_options">
           <fieldset>
-            <input type="hidden" name="product_option_id" value="<%= o[:id] %>" />
-            <legend><%=o[:display] %></legend>
+            <input type="hidden" name="product_option_id" value="<%= o.id %>" />
+            <legend><%= o.presentation %></legend>
             <dl>
-              <dt><%=o[:display] %></dt>
+              <dt><%= o.presentation %></dt>
             </dl>
             <ul>
-              <% if o[:optional] %>
+              <% if o.optional %>
                 <li>
                   <label>
-                    <%= radio_button_tag "option_#{o[:display].downcase.gsub(/\s/, '_')}", "", (optional_value.empty? ? true : false), {:class => 'product_option'} %>
+                    <%= radio_button_tag "option_#{o.presentation.downcase.gsub(/\s/, '_')}", "", !optional_value.present?, {:class => 'product_option'} %>
                     <span class="options-row" data-hook="options-row">
-                      <strong>No <%=o[:display] %></strong>
+                      <strong>No <%=o.presentation %></strong>
                     </span>
-                    <input type="hidden" name="<%= "option_#{o[:id]}_price" %>" value="0" />
-                    <input type="hidden" name="<%= "option_#{o[:id]}_qty" %>" value="<%= "0" %>" />
+                    <input type="hidden" name="<%= "option_#{o.id}_price" %>" value="0" />
+                    <input type="hidden" name="<%= "option_#{o.id}_qty" %>" value="0" />
                   </label>
                 </li>
               <% end %>
-              <% o[:options].each_with_index do |v, i| %>
-                <li class="lucky-option <%= (v[:available] ? "available" : "not_available") %>">
+              <% o.option_values.each_with_index do |v, i| %>
+                <li class="lucky-option <%= (v.available ? "available" : "not_available") %>">
                   <label>
-                    <%= radio_button_tag( "option_#{o[:display].downcase.gsub(/\s/, '_')}", v[:id], (!optional_value.empty? && optional_value_id[:id] == v[:id]) || (!o[:optional] && optional_value.empty? && i == 0), {:class => 'product_option', :disabled => !v[:available]} ) %>
+                    <%= radio_button_tag( "option_#{o.presentation.downcase.gsub(/\s/, '_')}", v.id, (!optional_value.empty? && optional_value_id.id == v.id) || (!o.optional && optional_value.empty? && i == 0), {:class => 'product_option', :disabled => !v.available} ) %>
                     <span class="options-row" data-hook="options-row">
-                      <strong><%= "#{v[:presentation]}" %></strong>
-                      <% if v[:state].present? && @product.shipping_category.try(:name) == 'DIY' %>
+                      <strong><%= "#{v.presentation}" %></strong>
+                      <% if v.default_stock_state.present? && @product.shipping_category.try(:name) == 'DIY' %>
                         <span class="product-state">
-                          - (<%= v[:state] %>)
+                          - (<%= v.default_stock_state %>)
                         </span>
                       <% end %>
-                      <% if v[:price] > 0 %>
-                        <span><%= "- #{Spree::Money.new(v[:price] || 0)}" %></span>
+                      <% if v.price > 0 %>
+                        <span><%= "- #{Spree::Money.new(v.price || 0)}" %></span>
                       <% end %>
                     </span>
-                    <input type="hidden" name="<%= "option_#{o[:id]}_price" %>" value="<%= "#{v[:price]}" %>" />
-                    <input type="hidden" name="<%= "option_#{o[:id]}_qty" %>" value="<%= "#{v[:quantity]}" %>" />
-                    <%= link_to("", product_path(v[:option_product]), {:class => "fa fa-exclamation-circle" }) if v[:option_product].present? %>
+                    <input type="hidden" name="<%= "option_#{o.id}_price" %>" value="<%= "#{v.price}" %>" />
+                    <input type="hidden" name="<%= "option_#{o.id}_qty" %>" value="<%= "#{v.quantity}" %>" />
+                    <%= link_to_if(v.product, "", product_path(v.product), {:class => "fa fa-exclamation-circle" }) %>
                   </label>
                 </li>
               <% end %>

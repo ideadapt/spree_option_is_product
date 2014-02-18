@@ -32,7 +32,7 @@ Spree::OrdersController.class_eval do
     unless current_order.blank? || current_order.line_items.blank?
       current_order.line_items.where("parent_id is not null").each do |l|
         quantity = nil
-        l.parent.variant.product.product_options.each { |i| i[:options].each { |o| quantity = o[:quantity] if o[:variant_id] == l.variant_id } }
+        l.parent.variant.product.product_options.each { |i| i.option_values.each { |o| quantity = o.quantity if o.variant_id == l.variant_id } }
         l.quantity = l.parent.quantity * (quantity || 1)
         l.save
       end
