@@ -6,4 +6,8 @@ Spree::OptionType.class_eval do
   def price_of_first_option
     option_values.first.try :price
   end
+
+  def not_available
+    option_values.none? &:available
+  end
 end

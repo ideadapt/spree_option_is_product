@@ -10,8 +10,8 @@ Spree::OrdersController.class_eval do
         parent = current_order.find_line_item_by_variant(Spree::Variant.find(params["variants"].first[0]))
         return if parent.nil?
         params["product_options"].each do |k,v|
-          next if v.blank?
-          ov = Spree::OptionValue.find(v)
+          next unless v && v.key?("selected") && v["selected"].present?
+          ov = Spree::OptionValue.find(v["selected"])
           if !!spree_current_user && !!spree_current_user.user_group && !! spree_current_user.user_group.name.match(/^Distributor.*/)
             price = ov.distributor_price
           else
@@ -22,7 +22,7 @@ Spree::OrdersController.class_eval do
           # Here we force the creation of new LineItems so we don't
           # merge product's options with existing items in the order
           # by passing the parent_id indicating that it's an option.
-          current_order.contents.add(ov.variant,(ov.quantity * parent.quantity),current_currency, nil, (price || ov.variant.price), parent.id)
+          current_order.contents.add(ov.variant,(v["quantity"].to_i * parent.quantity),current_currency, nil, (price || ov.variant.price), parent.id)
         end
       end
     end
@@ -31,10 +31,13 @@ Spree::OrdersController.class_eval do
   def update_children
     unless current_order.blank? || current_order.line_items.blank?
       current_order.line_items.where("parent_id is not null").each do |l|
-        quantity = nil
-        l.parent.variant.product.product_options.each { |i| i.option_values.each { |o| quantity = o.quantity if o.variant_id == l.variant_id } }
-        l.quantity = l.parent.quantity * (quantity || 1)
-        l.save
+        parent_product = l.parent.product
+        min_qty = parent_product.min_quantity_for_part(l.variant_id) * l.parent.quantity
+        if l.quantity < min_qty
+          flash[:error] = Spree.t(:quantities_were_readjusted)
+          l.quantity = min_qty
+          l.save
+        end
       end
     end
   end

@@ -2,6 +2,7 @@ Spree::Product.class_eval do
 
   scope :kits, -> { joins(:option_types).where(:spree_option_types => { :product_based => true }).uniq }
   has_many :product_options, through: :product_option_types, source: :option_type, conditions: { product_based: true}
+  has_many :option_values, through: :product_options
 
   def master_price(some_price=nil)
     new_price = some_price || self.price
@@ -18,6 +19,10 @@ Spree::Product.class_eval do
 
   def master_client_price
     self.master_price(Spree::Price.where(:variant_id => self.master.id).first.try(:amount))
+  end
+
+  def min_quantity_for_part(variant_id)
+    option_values.find{|ov| ov.variant_id == variant_id}.try(:quantity)
   end
 
 end

@@ -2,14 +2,14 @@ class ProductKit
   base_price: 0
   constructor: () ->
     @set_base_price parseFloat($('#base_price').val(), 10)
+    @update_cart_options()
+    @update_cart_total()
     #listens for changes and updates order total
-    $('.product_option').change (event) =>
-      $('.product_options').each (index, element) =>
-        @update_cart_options $(element)
-
-    #initial option fields setup and order total calculation
-    $('.product_options').each (index, element) =>
-      @update_cart_options $(element)
+    $('.option_type_select').change (event) =>
+      @update_related_fields(event.target)
+      @update_cart_total()
+    $('.product_option_quantities').change (event) =>
+      @update_cart_total()
 
   #Set the base price
   set_base_price: (price)->
@@ -20,19 +20,31 @@ class ProductKit
     return @base_price
 
   #Update the option fields on sidebar
-  update_cart_options: (options) ->
-    el = $('fieldset ul li label input:checked', options)
-    oid = $('fieldset input[name="product_option_id"]', options).val()
-    if el.length > 0
-      $('#selected_option_' + oid + ' span').text el.siblings('.options-row').find('strong').text()
-      $('#product_option_' + oid).val(el.val())
-      $('#product_option_' + oid + '_price').val(parseFloat(el.siblings('input[name="option_' + oid + '_price"]').val(), 10))
-      quantity_not_zero = parseFloat(el.siblings('input[name="option_' + oid + '_qty"]').val(), 10)
-      #quantity_not_zero = quantity_not_zero === 0 ? 1 : quantity_not_zero
-      if quantity_not_zero == 0
-        quantity_not_zero = 1
-      $('#product_option_' + oid + '_quantity').val(quantity_not_zero)
-      this.update_cart_total()
+  update_cart_options: ->
+    selects = $('select.option_type_select');
+    @update_related_fields(el) for el in selects
+
+  update_related_fields: (el) ->
+    el = $(el)
+    [oid, selected_option] = [el.attr('id'), el.find(":selected")]
+    [price, qty] = [parseFloat(selected_option.data('price'), 10), parseFloat(selected_option.data('qty'), 10)]
+    [price_display_element, qty_field] = [$("##{oid}_price_display"), $("##{oid}_quantity")]
+
+    if isNaN(price)
+      price = 0
+      price_display_element.text '--'
+    else
+      price_display_element.text "$#{price}"
+
+    $("##{oid}_price").val(price)
+
+    if isNaN(qty)
+      qty_field.attr('readonly', 'readonly').val(0)
+    else
+      qty_field.attr 'min', qty
+      qty_field.removeAttr('readonly').val(qty)
+
+    $("##{oid}").val(el.val())
 
   #Update Order total
   update_cart_total: () ->
@@ -45,6 +57,7 @@ class ProductKit
 jQuery ->
   $(document).ready ->
     new ProductKit()
+    $('.option_type_select').select2(minimumResultsForSearch: -1, width: '65%')
 
 Spree.ready ($) ->
   reset_children_quantity = ->
