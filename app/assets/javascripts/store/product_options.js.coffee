@@ -3,7 +3,7 @@ class ProductKit
   constructor: () ->
     @set_base_price parseFloat($('#base_price').val(), 10)
     @update_cart_options()
-    @update_cart_total()
+    @update_cart_total() if $("#specs-list").is "*"
     #listens for changes and updates order total
     $('.option_type_select').change (event) =>
       @update_related_fields(event.target)
