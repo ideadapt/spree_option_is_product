@@ -30,7 +30,8 @@ Spree::OrdersController.class_eval do
           current_order.contents.add(ov.variant, quantity_needed, current_currency, nil, (price || ov.variant.price), parent.id)
           if v["quantity"].to_i > quantity_needed
             left = v["quantity"].to_i - quantity_needed
-            current_order.contents.add(ov.variant, left, current_currency, nil, (price || ov.variant.price), nil)
+            # For extra parts use the regular variant price
+            current_order.contents.add(ov.variant, left, current_currency, nil, ov.variant.price, nil) if ov.variant.available?
           end
         end
       end
