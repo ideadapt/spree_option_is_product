@@ -8,6 +8,10 @@ Spree::LineItem.class_eval do
     self.order.line_items.select { |l| l.parent_id == self.id }
   end
 
+  def quantity_needed_for_part(variant_id)
+    self.quantity * product.min_quantity_for_part(variant_id)
+  end
+
   #From spree 2.2 to match new OrderInventory params
   private
   def update_inventory

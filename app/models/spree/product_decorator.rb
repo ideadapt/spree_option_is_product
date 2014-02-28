@@ -22,7 +22,7 @@ Spree::Product.class_eval do
   end
 
   def min_quantity_for_part(variant_id)
-    option_values.find{|ov| ov.variant_id == variant_id}.try(:quantity)
+    option_values.find{|ov| ov.variant_id == variant_id}.try(:quantity) || 0
   end
 
 end
