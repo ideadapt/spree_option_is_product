@@ -50,7 +50,11 @@ class ProductKit
   update_cart_total: () ->
     current_total = @get_base_price()
     $('.product_option_prices').each (index, element) =>
-      item_multiply = parseInt($(element).siblings('.product_option_quantities').val(), 10)
+      qty_field = $(element).siblings('.product_option_quantities')
+      quantity = parseInt qty_field.val(), 10
+      quantity = if !isNaN(quantity) && quantity > 0 then quantity else qty_field.attr('min')
+      qty_field.val(quantity) unless qty_field.attr("readonly")
+      item_multiply = parseInt(quantity, 10)
       current_total += (parseFloat($(element).val(), 10) * item_multiply)
     $('#product-price span.price').text "$" + ( current_total.toFixed(2) )
 
