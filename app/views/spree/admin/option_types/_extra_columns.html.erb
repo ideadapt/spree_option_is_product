@@ -1,5 +1,14 @@
 <% if @option_type.product_based? %>
   <td>
+    <% v = f.object.variant %>
+
+    <% if (v.present?) %>
+      <%= link_to("#{v.product.name} [#{v.sku}]", admin_product_path(v.product)) %>
+    <% else %>
+      <%= "nil" %>
+    <% end %>
+  </td>
+  <td>
     <%= f.text_field :quantity %>
   </td>
   <td>

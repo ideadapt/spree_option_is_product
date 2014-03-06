@@ -3,6 +3,7 @@ Spree::Product.class_eval do
   scope :kits, -> { joins(:option_types).where(:spree_option_types => { :product_based => true }).uniq }
   has_many :product_options, through: :product_option_types, source: :option_type, conditions: { product_based: true}
   has_many :option_values, through: :product_options
+  validate :verify_options
 
   def master_price(some_price=nil)
     new_price = some_price || self.price
@@ -23,6 +24,13 @@ Spree::Product.class_eval do
 
   def min_quantity_for_part(variant_id)
     option_values.find{|ov| ov.variant_id == variant_id}.try(:quantity) || 0
+  end
+
+  private
+  def verify_options
+    unless option_values.all? { |o| o.valid? }
+      errors.add(:option_values, "are invalid", srict: true)
+    end
   end
 
 end

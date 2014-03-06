@@ -4,6 +4,7 @@ Spree::OptionValue.class_eval do
   scope :default, -> { where default_option: true }
 
   delegate :default_stock_state, :default_stock_item, :product, to: :variant, allow_nil: true
+  validates :variant, :presence => true, :if => "option_type.product_based?"
 
   def available
     default_stock_item.nil? ? true : default_stock_item.available?
