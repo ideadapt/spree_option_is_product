@@ -1,9 +1,9 @@
 en:
-  product_based: "Product Based"
-  add_this_variant: "Add this variant"
-  special_price: "Special Price"
-  optional: "Optional?"
   spree:
     product_option_not_available: "not available"
     product_option_backorder: "backorder"
     quantities_were_readjusted: "The quantities of some options have been automatically adjusted"
+    product_based: "Product Based"
+    add_this_variant: "Add this variant"
+    special_price: "Special Price"
+    optional: "Optional?"

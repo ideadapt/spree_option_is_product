@@ -1,6 +1,6 @@
 <div class="omega two columns">
   <%= f.field_container :product_based do %>
-    <%= f.label :product_based, t(:product_based) %>
+    <%= f.label :product_based, Spree.t(:product_based) %>
     <% if @option_type.product_based %>
       <%= f.check_box :product_based, { :disabled => 'disabled' } %>
     <% else %>
@@ -12,7 +12,7 @@
 
 <div class="omega two columns">
   <%= f.field_container :optional do %>
-    <%= f.label :optional, t(:optional) %>
+    <%= f.label :optional, Spree.t(:optional) %>
     <% if @option_type.product_based %>
       <%= f.check_box :optional %>
     <% end %>
