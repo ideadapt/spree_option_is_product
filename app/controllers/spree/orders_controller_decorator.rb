@@ -31,7 +31,7 @@ Spree::OrdersController.class_eval do
           if v["quantity"].to_i > quantity_needed
             left = v["quantity"].to_i - quantity_needed
             # For extra parts use the regular variant price
-            current_order.contents.add(ov.variant, left, current_currency, nil, ov.variant.price, nil) if ov.variant.available?
+            current_order.contents.add(ov.variant, left, current_currency, nil, ov.variant.price, nil) if ov.variant.product.available?
           end
         end
       end
