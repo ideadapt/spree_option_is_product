@@ -127,6 +127,14 @@ table.stock-contents{
               border-left: 0 none;
             }
           }
+          .option_details {
+            background: #f2f2f2;
+            height: 25px;
+            margin: 5px 0 0;
+            width: 380px;
+            border-top: 1px solid #e5e5e5;
+            padding: 5px;
+          }
           .select2-container-disabled .select2-choice {
             color: #999;
             .select2-arrow {

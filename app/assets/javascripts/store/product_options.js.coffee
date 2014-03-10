@@ -8,8 +8,10 @@ class ProductKit
     $('.option_type_select').change (event) =>
       @update_related_fields(event.target)
       @update_cart_total()
+      @reset_and_hide_parts_details($(event.target).closest('.cart-option-row'))
     $('.product_option_quantities').change (event) =>
       @update_cart_total()
+      @display_extra_parts_details(event.target)
 
   #Set the base price
   set_base_price: (price)->
@@ -27,16 +29,17 @@ class ProductKit
   update_related_fields: (el) ->
     el = $(el)
     [oid, selected_option] = [el.attr('id'), el.find(":selected")]
-    [price, qty] = [parseFloat(selected_option.data('price'), 10), parseFloat(selected_option.data('qty'), 10)]
+    [price, regular_price, qty] = [parseFloat(selected_option.data('price'), 10), parseFloat(selected_option.data('regular-price'), 10), parseFloat(selected_option.data('qty'), 10)]
     [price_display_element, qty_field] = [$("##{oid}_price_display"), $("##{oid}_quantity")]
 
     if isNaN(price)
       price = 0
+      regular_price = 0 # if price is NaN then regular price is also (e.g. empty option)
       price_display_element.text '--'
     else
       price_display_element.text "$#{price}"
 
-    $("##{oid}_price").val(price)
+    $("##{oid}_price").val(price).attr('data-regular-price', regular_price)
 
     if isNaN(qty)
       qty_field.attr('readonly', 'readonly').val(0)
@@ -55,8 +58,36 @@ class ProductKit
       quantity = if !isNaN(quantity) && quantity > 0 then quantity else qty_field.attr('min')
       qty_field.val(quantity) unless qty_field.attr("readonly")
       item_multiply = parseInt(quantity, 10)
-      current_total += (parseFloat($(element).val(), 10) * item_multiply)
+      min_qty = parseInt(qty_field.attr('min'), 10)
+      extra_qty = item_multiply - min_qty
+      regular_price_sum = parseFloat($(element).attr('data-regular-price')) * extra_qty
+      kit_price_sum = (parseFloat($(element).val(), 10) * min_qty)
+      current_total += regular_price_sum
+      current_total += kit_price_sum
     $('#product-price span.price').text "$" + ( current_total.toFixed(2) )
+
+  display_extra_parts_details: (el) ->
+    el = $(el)
+    current_qty = el.val()
+    min_qty = el.attr('min')
+
+    selected_option = el.siblings('.option_type_select').find(":selected")
+    kit_price = selected_option.data('price')
+    regular_price = selected_option.data('regular-price')
+
+    row = $(el).closest('.cart-option-row')
+    details = if ($('.option_details', row).length > 0) then $('.option_details', row) else $('<div class="option_details"></div>').appendTo(row).hide()
+
+    if current_qty > min_qty
+      details.slideDown('fast')
+      extra_qty = current_qty - min_qty
+      details.text("#{min_qty} @ $#{kit_price} and #{extra_qty} @ $#{regular_price}")
+    else
+      @reset_and_hide_parts_details(row)
+
+  reset_and_hide_parts_details: (row) ->
+    $('.option_details', row).text('').slideUp()
+
 
 jQuery ->
   $(document).ready ->
