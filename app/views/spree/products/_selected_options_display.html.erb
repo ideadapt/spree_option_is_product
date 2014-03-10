@@ -8,7 +8,11 @@
         <%= select_tag "select_option_#{o.id}", options_for_select(o.option_values.map{|v| [v.presentation, v.id, {'data-price' => v.price, 'data-regular-price' => v.variant.price, 'data-qty' => v.quantity}]}), class: 'option_type_select', prompt: (o.optional ? "No #{o.presentation}" : nil), id: "product_option_#{o.id}" %>
         <span class="cart-option-price" id="product_option_<%=o.id%>_price_display">0</span>
         <input type="hidden" id="product_option_<%=o.id%>_price" class="product_option_prices" value="0">
-        <input type="number" id="product_option_<%=o.id%>_quantity" class="product_option_quantities" value="0" min="0" name="product_options[<%=o.id%>][quantity]">
+        <% if o.allow_multiple? %>
+          <input type="number" id="product_option_<%=o.id%>_quantity" class="product_option_quantities" value="0" min="0" name="product_options[<%=o.id%>][quantity]">
+        <% else %>
+          <input type="hidden" id="product_option_<%=o.id%>_quantity" class="product_option_quantities" value="0" min="0" name="product_options[<%=o.id%>][quantity]">
+        <% end %>
       </div>
     <% end %>
     <small><%= "*#{not_available.map{|o| content_tag(:em, o.presentation)}.to_sentence} aren't available".html_safe if not_available.present?%></small>

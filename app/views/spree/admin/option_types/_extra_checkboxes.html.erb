@@ -20,3 +20,14 @@
   <% end %>
 </div>
 
+<div class="omega two columns">
+  <%= f.field_container :allow_multiple do %>
+    <%= f.label :allow_multiple, t(:allow_multiple) %>
+    <% if @option_type.product_based %>
+      <%= f.check_box :allow_multiple %>
+    <% end %>
+    <%= f.error_message_on :allow_multiple %>
+  <% end %>
+</div>
+
+
