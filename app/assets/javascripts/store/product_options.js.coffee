@@ -78,6 +78,10 @@ class ProductKit
     row = $(el).closest('.cart-option-row')
     details = if ($('.option_details', row).length > 0) then $('.option_details', row) else $('<div class="option_details"></div>').appendTo(row).hide()
 
+    if regular_price == kit_price
+      @reset_and_hide_parts_details(row)
+      return
+
     if current_qty > min_qty
       details.slideDown('fast')
       extra_qty = current_qty - min_qty
