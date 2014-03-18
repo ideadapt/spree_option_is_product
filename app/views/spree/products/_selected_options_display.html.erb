@@ -9,7 +9,7 @@
         <span class="cart-option-price" id="product_option_<%=o.id%>_price_display">0</span>
         <input type="hidden" id="product_option_<%=o.id%>_price" class="product_option_prices" value="0">
         <% if o.allow_multiple? %>
-          <input type="number" id="product_option_<%=o.id%>_quantity" class="product_option_quantities" value="0" min="0" name="product_options[<%=o.id%>][quantity]">
+          <%= select_tag "product_options[#{o.id}][quantity]", options_for_select(0..5), id: "product_option_#{o.id}_quantity", class: "product_option_quantities", min: "0" %>
         <% else %>
           <input type="hidden" id="product_option_<%=o.id%>_quantity" class="product_option_quantities" value="0" min="0" name="product_options[<%=o.id%>][quantity]">
         <% end %>
